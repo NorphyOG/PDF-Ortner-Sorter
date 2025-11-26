@@ -4,9 +4,10 @@ using PDFOrtnerSorter.Services.Abstractions;
 
 namespace PDFOrtnerSorter.Services.Implementations;
 
-public sealed class FileLoggerService : ILoggerService
+public sealed class FileLoggerService : ILoggerService, IDisposable
 {
     private readonly object _syncRoot = new();
+    private readonly StreamWriter _writer;
     public string LogFilePath { get; }
 
     public FileLoggerService()
@@ -14,6 +15,11 @@ public sealed class FileLoggerService : ILoggerService
         var root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PDFOrtnerSorter", "Logs");
         Directory.CreateDirectory(root);
         LogFilePath = Path.Combine(root, "app.log");
+        
+        // Open with FileShare.ReadWrite to avoid locking issues
+        var stream = new FileStream(LogFilePath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+        _writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true };
+        
         WriteLine("=== Application start ===");
     }
 
@@ -36,7 +42,15 @@ public sealed class FileLoggerService : ILoggerService
         var line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} {content}";
         lock (_syncRoot)
         {
-            File.AppendAllText(LogFilePath, line + Environment.NewLine, Encoding.UTF8);
+            _writer.WriteLine(line);
+        }
+    }
+
+    public void Dispose()
+    {
+        lock (_syncRoot)
+        {
+            _writer?.Dispose();
         }
     }
 }

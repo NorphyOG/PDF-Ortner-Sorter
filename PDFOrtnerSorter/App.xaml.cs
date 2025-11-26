@@ -110,6 +110,11 @@ public partial class App : Application
 				await queue.DisposeAsync();
 			}
 
+			if (_logger is IDisposable disposableLogger)
+			{
+				disposableLogger.Dispose();
+			}
+
 			_host.Dispose();
 		}
 
