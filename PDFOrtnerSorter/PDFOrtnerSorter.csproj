@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
+    <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
+    <PackageReference Include="PdfiumViewer" Version="2.13.0" />
+    <PackageReference Include="PdfiumViewer.Wpf" Version="1.0.6" />
+    <PackageReference Include="PdfiumViewer.Native.x86_64.v8-xfa" Version="2018.4.8.256" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(NuGetPackageRoot)pdfiumviewer.native.x86_64.v8-xfa\2018.4.8.256\Build\x64\pdfium.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <Link>pdfium.dll</Link>
+      <Visible>false</Visible>
+    </None>
+  </ItemGroup>
+
+</Project>

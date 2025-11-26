@@ -1,0 +1,82 @@
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio cache/options directory
+.vs/
+.vscode/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# NuGet Packages
+*.nupkg
+*.snupkg
+packages/
+!**/packages/build/
+
+# MSBuild Binary and Structured Log
+*.binlog
+
+# Publishing
+[Pp]ublish/
+*.pubxml
+*.publishproj
+
+# Rider
+.idea/
+*.sln.iml
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin
+$RECYCLE.BIN/
+
+# VS Code directories
+.vscode/
+
+# Mac files
+.DS_Store
+
+# Test coverage
+coverage/
+*.coverage
+*.coveragexml
+
+# Local development
+*.local
+.env
+.env.local
+
+# Temporary files
+*.tmp
+*.temp
+~$*
+
+# Application logs
+*.log
+
+# Portable build artifacts
+PDFOrtnerSorter_Portable.zip
+Portable/
