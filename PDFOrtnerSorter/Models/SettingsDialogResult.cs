@@ -5,4 +5,5 @@ public sealed record SettingsDialogResult(
     string? DestinationBaseFolder,
     string DestinationFolderName,
     bool IncludeSubfolders,
-    int PreviewCacheLimitMb);
+    int PreviewCacheLimitMb,
+    AppSettings Settings);

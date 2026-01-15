@@ -7,6 +7,6 @@ public interface IMoveService
     Task<MoveBatchResult> MoveAsync(IEnumerable<PdfDocumentInfo> documents,
                                      string destinationBase,
                                      string destinationFolderName,
-                                     IProgress<MoveProgress>? progress,
+                                     IProgress<DetailedMoveProgress>? progress,
                                      CancellationToken cancellationToken);
 }

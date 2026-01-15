@@ -6,4 +6,5 @@ namespace PDFOrtnerSorter.Services.Abstractions;
 public interface ISettingsDialogService
 {
     Task<SettingsDialogResult?> ShowAsync(SettingsDialogResult currentSettings);
+    Task<SettingsDialogResult?> ShowAsync(SettingsDialogResult currentSettings, AppSettings? appSettings);
 }

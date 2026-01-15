@@ -11,8 +11,16 @@ $zipPath = Join-Path -Path "PDFOrtnerSorter\bin" -ChildPath "PDFOrtnerSorter_Por
 if (Test-Path $publishDir) {
     Remove-Item $publishDir -Recurse -Force
 }
+
+# Gracefully remove zip file if it exists
 if (Test-Path $zipPath) {
-    Remove-Item $zipPath -Force
+    try {
+        Remove-Item $zipPath -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Milliseconds 500
+    }
+    catch {
+        Write-Warning "Could not remove old zip file immediately, will proceed anyway"
+    }
 }
 
 Write-Host "Publishing portable build..."
@@ -34,6 +42,6 @@ if (Test-Path $pdfiumSource) {
 }
 
 Write-Host "Creating zip package..."
-Compress-Archive -Path (Join-Path $publishDir '*') -DestinationPath $zipPath
+Compress-Archive -Path (Join-Path $publishDir '*') -DestinationPath $zipPath -Force
 Write-Host "Portable build available at" $publishDir
 Write-Host "Zip package created at" $zipPath

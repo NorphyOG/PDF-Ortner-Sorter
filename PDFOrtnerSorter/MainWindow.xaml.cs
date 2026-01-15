@@ -51,4 +51,12 @@ public partial class MainWindow : Window
         item.IsSelected = shouldSelect;
         e.Handled = true;
     }
+
+    private void OnSuggestionMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is TextBlock { Text: string suggestion })
+        {
+            _viewModel.DestinationFolderName = suggestion;
+        }
+    }
 }

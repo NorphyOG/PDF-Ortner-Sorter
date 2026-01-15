@@ -46,6 +46,8 @@ public partial class App : Application
 		services.AddSingleton<IFileService, FileService>();
 		services.AddSingleton<IPreviewService, PreviewService>();
 		services.AddSingleton<IMoveService, MoveService>();
+		services.AddSingleton<IJobQueueService, JobQueueService>();
+		services.AddSingleton<IJobStore, JobStore>();
 		services.AddSingleton<ISettingsService, SettingsService>();
 		services.AddSingleton<ISettingsDialogService, SettingsDialogService>();
 		services.AddSingleton<ICatalogStore, CatalogStore>();
@@ -53,6 +55,9 @@ public partial class App : Application
 		services.AddSingleton<IMoveConfirmationService, MoveConfirmationService>();
 		services.AddSingleton<ILoggerService, FileLoggerService>();
 		services.AddSingleton<IBackgroundJobQueue>(_ => new BackgroundJobQueue(maxConcurrency: 4));
+		services.AddSingleton<ILabelPrintService, LabelPrintService>();
+		services.AddSingleton<ILabelPrintDialogService, LabelPrintDialogService>();
+		services.AddSingleton<IAutostartService, AutostartService>();
 
 		services.AddSingleton<MainViewModel>();
 		services.AddSingleton<MainWindow>();

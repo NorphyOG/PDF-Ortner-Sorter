@@ -33,6 +33,7 @@ public sealed partial class PdfDocumentViewModel : ObservableObject
     public string FileName => Document.FileName;
     public string DisplaySize => FormatSize(Document.Length);
     public string Location => Document.FullPath;
+    public DateTime LastModified => Document.LastWriteTimeUtc.ToLocalTime();
 
     public ReadOnlyObservableCollection<BitmapImage> Thumbnails { get; }
 
@@ -54,37 +55,52 @@ public sealed partial class PdfDocumentViewModel : ObservableObject
             _previewRequested = true;
         }
 
-        _ = _backgroundJobQueue.QueueAsync(async token =>
+        SafeQueuePreviewGeneration();
+    }
+
+    /// <summary>
+    /// Safe wrapper for fire-and-forget QueueAsync to prevent unobserved exceptions
+    /// </summary>
+    private async void SafeQueuePreviewGeneration()
+    {
+        try
         {
-            try
+            await _backgroundJobQueue.QueueAsync(async token =>
             {
-                token.ThrowIfCancellationRequested();
-                var preview = await _previewService.GetPreviewAsync(Document, token).ConfigureAwait(false);
-                var images = preview.ImagePaths.Select(CreateImage).Where(b => b is not null).ToList();
-
-                await Application.Current.Dispatcher.InvokeAsync(() =>
+                try
                 {
-                    _thumbnails.Clear();
-                    foreach (var image in images)
-                    {
-                        if (image is not null)
-                        {
-                            _thumbnails.Add(image);
-                        }
-                    }
+                    token.ThrowIfCancellationRequested();
+                    var preview = await _previewService.GetPreviewAsync(Document, token).ConfigureAwait(false);
+                    var images = preview.ImagePaths.Select(CreateImage).Where(b => b is not null).ToList();
 
-                    IsPreviewLoaded = _thumbnails.Count > 0;
-                });
-            }
-            catch (OperationCanceledException)
-            {
-                // Ignore cancellations triggered by list refreshes.
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Preview error for {Document.FileName}: {ex.Message}");
-            }
-        }, cancellationToken);
+                    await Application.Current.Dispatcher.InvokeAsync(() =>
+                    {
+                        _thumbnails.Clear();
+                        foreach (var image in images)
+                        {
+                            if (image is not null)
+                            {
+                                _thumbnails.Add(image);
+                            }
+                        }
+
+                        IsPreviewLoaded = _thumbnails.Count > 0;
+                    });
+                }
+                catch (OperationCanceledException)
+                {
+                    // Ignore cancellations triggered by list refreshes.
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Preview error for {Document.FileName}: {ex.Message}");
+                }
+            }, CancellationToken.None);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to queue preview generation: {ex.Message}");
+        }
     }
 
     private static BitmapImage? CreateImage(string path)

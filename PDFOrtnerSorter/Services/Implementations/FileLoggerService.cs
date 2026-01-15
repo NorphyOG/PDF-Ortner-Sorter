@@ -1,5 +1,6 @@
 using System.IO;
 using System.Text;
+using PDFOrtnerSorter.Models;
 using PDFOrtnerSorter.Services.Abstractions;
 
 namespace PDFOrtnerSorter.Services.Implementations;
@@ -37,6 +38,41 @@ public sealed class FileLoggerService : ILoggerService, IDisposable
         WriteLine(builder.ToString());
     }
 
+    public void LogTransferStatistics(
+        MoveBatchResult result,
+        TimeSpan duration,
+        double averageSpeedMBps,
+        double peakSpeedMBps)
+    {
+        var successRate = result.RequestedCount > 0 ? (result.SuccessCount * 100.0 / result.RequestedCount) : 0;
+        var builder = new StringBuilder();
+        builder.AppendLine("=== Transfer Statistics ===");
+        builder.AppendLine($"Duration: {duration:hh\\:mm\\:ss}");
+        builder.AppendLine($"Total Files: {result.RequestedCount}");
+        builder.AppendLine($"Successful: {result.SuccessCount}");
+        builder.AppendLine($"Failed: {result.Failures.Count}");
+        builder.AppendLine($"Success Rate: {successRate:F1}%");
+        builder.AppendLine($"Total Bytes: {FormatBytes(result.BytesTransferred)}");
+        builder.AppendLine($"Average Speed: {averageSpeedMBps:F1} MB/s");
+        builder.AppendLine($"Peak Speed: {peakSpeedMBps:F1} MB/s");
+        
+        if (result.BackupDirectory != null)
+        {
+            builder.AppendLine($"Rollback Backup: {result.BackupDirectory}");
+        }
+
+        if (result.Failures.Count > 0)
+        {
+            builder.AppendLine("Failures:");
+            foreach (var failure in result.Failures)
+            {
+                builder.AppendLine($"  - {failure.SourcePath}: {failure.Reason}");
+            }
+        }
+
+        WriteLine(builder.ToString());
+    }
+
     private void WriteLine(string content)
     {
         var line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} {content}";
@@ -44,6 +80,19 @@ public sealed class FileLoggerService : ILoggerService, IDisposable
         {
             _writer.WriteLine(line);
         }
+    }
+
+    private static string FormatBytes(long bytes)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+        double len = bytes;
+        int order = 0;
+        while (len >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            len = len / 1024;
+        }
+        return $"{len:0.##} {sizes[order]}";
     }
 
     public void Dispose()
